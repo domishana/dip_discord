@@ -3,6 +3,7 @@
 import discord
 from discord.ext import commands as c
 from country import country_list, Country
+from itertools import combinations
 
 
 class ArrangeGuild(c.Cog):
@@ -11,7 +12,7 @@ class ArrangeGuild(c.Cog):
         self._bot.add_cog(CreateRoles())
         self._bot.add_cog(ListRoles())
         self._bot.add_cog(Categories())
-        self._bot.add_cog(Channels())
+        self._bot.add_cog(Channels(bot))
 
 
 class CreateRoles(c.Cog):
@@ -68,6 +69,10 @@ class Categories(c.Cog):
 
 
 class Channels(c.Cog):
+    def __init__(self, bot):
+        self._bot = bot
+        self._bot.add_cog(CreateChannels())
+
     @c.command(name="l_chs")
     async def list_channels(self, ctx: c.Context):
         paginator = c.Paginator()
@@ -75,4 +80,52 @@ class Channels(c.Cog):
             paginator.add_line('{0}:{1}'.format(_ch.id, _ch.name))
         for page in paginator.pages:
             await ctx.send(page)
+        return
+
+
+class CreateChannels(c.Cog):
+    @c.command(name="c_chs")
+    async def create_channels(self, ctx: c.Context):
+        await self.create_channels_for_all(ctx)
+        await self.create_channels_for_diplomacy(ctx)
+        await self.create_channels_for_domestic(ctx)
+
+    async def create_channels_for_all(self, ctx: c.Context):
+        if discord.utils.get(ctx.guild.channels, name="全員") is not None:
+            await ctx.send("既に全体カテゴリ内のチャンネルを生成済みのため実行できませんでした。")
+            return
+
+        _category = discord.utils.get(ctx.guild.categories, name="全体")
+
+        created_for_all = await ctx.guild.create_text_channel(name="全員", category=_category)
+        await ctx.send("<#{0}> を作成しました。".format(created_for_all.id))
+
+        created_for_all_players = await ctx.guild.create_text_channel(name="全体外交", category=_category)
+        await ctx.send("<#{0}> を作成しました。".format(created_for_all_players.id))
+        return
+
+    async def create_channels_for_diplomacy(self, ctx: c.Context):
+        if discord.utils.get(
+                ctx.guild.channels, name=(country_list[0].get_short() + "-" + country_list[1].get_short())) is not None:
+            await ctx.send("既に外交カテゴリ内のチャンネルを生成済みのため実行できませんでした。")
+            return
+
+        _category = discord.utils.get(ctx.guild.categories, name="外交")
+
+        for double_country in combinations(country_list, 2):
+            created = await ctx.guild.create_text_channel(
+                name=(double_country[0].get_short() + '-' + double_country[1].get_short()), category=_category)
+            await ctx.send("<#{0}> を作成しました。".format(created.id))
+        return
+
+    async def create_channels_for_domestic(self, ctx: c.Context):
+        if discord.utils.get(ctx.guild.channels, name=(country_list[0].get_name() + "国内")) is not None:
+            await ctx.send("既に国内カテゴリ内のチャンネルを生成済みのため実行できませんでした。")
+            return
+
+        _category = discord.utils.get(ctx.guild.categories, name="国内")
+
+        for country in country_list:
+            created = await ctx.guild.create_text_channel(name=(country.get_name() + "国内"), category=_category)
+            await ctx.send("<#{0}> を作成しました。".format(created.id))
         return
