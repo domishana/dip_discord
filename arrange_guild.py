@@ -14,7 +14,12 @@ class ArrangeGuild(c.Cog):
 
 class CreateRoles(c.Cog):
     @c.command(name="c_roles")
-    async def create_roles(self, ctx: c.Context):  # 何回でも同名の役職が生成されてしまう問題があるので解消すべき
+    async def create_roles(self, ctx: c.Context):
+        if discord.utils.get(ctx.guild.roles, name="Player") is not None:
+            print("既に役職を生成済みのため、実行できません。")
+            await ctx.send("既に役職を生成済みのため、実行できません。")
+            return
+
         _role = await ctx.guild.create_role(name="Player")
         print(_role.name)
         for _country in country_list:
