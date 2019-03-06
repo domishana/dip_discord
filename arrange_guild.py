@@ -56,7 +56,7 @@ class Categories(c.Cog):
         return
 
     @c.command(name="s_ctgs")
-    async def set_categories(self, ctx: c.Context):
+    async def set_categories(self, ctx: c.Context):  # 2回目実行すると、カテゴリ内のチャンネルは削除されずカテゴリのみ削除される問題点がある
         for category in ctx.guild.categories:
             await ctx.send("カテゴリ {0} を削除しました。".format(category.name))
             await category.delete()
