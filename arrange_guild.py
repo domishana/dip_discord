@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands as c
 from country import country_list, Country
 from itertools import combinations
+from cog_check import SubGuildOnly
 
 
 class ArrangeGuild(c.Cog):
@@ -15,7 +16,7 @@ class ArrangeGuild(c.Cog):
         self._bot.add_cog(Channels(bot))
 
 
-class CreateRoles(c.Cog):
+class CreateRoles(SubGuildOnly):
     @c.command(name="s_roles")
     async def set_roles(self, ctx: c.Context):
         if discord.utils.get(ctx.guild.roles, name="Player") is not None:
@@ -33,7 +34,7 @@ class CreateRoles(c.Cog):
         return
 
 
-class ListRoles(c.Cog):
+class ListRoles(SubGuildOnly):
     @c.command(name="l_roles")
     async def list_roles(self, ctx: c.Context):
         paginator = c.Paginator()
@@ -44,7 +45,7 @@ class ListRoles(c.Cog):
         return
 
 
-class Categories(c.Cog):
+class Categories(SubGuildOnly):
     default_category_names = ["全体", "外交", "国内", "その他"]
 
     @c.command(name="l_ctgs")
@@ -68,7 +69,7 @@ class Categories(c.Cog):
             await ctx.send("カテゴリ {0} を作成しました。".format(created_category.name))
 
 
-class Channels(c.Cog):
+class Channels(SubGuildOnly):
     def __init__(self, bot):
         self._bot = bot
         self._bot.add_cog(CreateChannels())
@@ -83,7 +84,7 @@ class Channels(c.Cog):
         return
 
 
-class CreateChannels(c.Cog):
+class CreateChannels(SubGuildOnly):
     @c.command(name="c_chs")
     async def create_channels(self, ctx: c.Context):
         await self.create_channels_for_all(ctx)

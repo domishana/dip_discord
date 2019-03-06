@@ -4,13 +4,7 @@ import discord
 from discord.ext import commands as c
 
 from private_info import kotori_guild_id, dip_test_guild_id
-
-"""
-class CogCheckBotOnly(c.Cog):
-    async def cog_check(self, ctx):
-        print(ctx.me, ctx.author)
-        return ctx.me == ctx.author
-"""
+from cog_check import MainGuildOnly
 
 
 class ManageGuilds(c.Cog, name="M_Guild"):
@@ -22,7 +16,7 @@ class ManageGuilds(c.Cog, name="M_Guild"):
         self._bot.add_cog(DeleteGuild())
 
 
-class CreateGuild(c.Cog):
+class CreateGuild(MainGuildOnly):
     @c.command(name="c_gld")
     async def create_guild(self, ctx: c.Context, arg: str):  # 10個を超えてサーバーを作ろうとするとエラーが出る問題は解消できてないよ
         created_guild = await ctx.bot.create_guild(arg)
@@ -38,7 +32,7 @@ class CreateGuild(c.Cog):
         return created_invite.url
 
 
-class ListOfGuilds(c.Cog):
+class ListOfGuilds(MainGuildOnly):
     @c.command(name="list_gld")
     async def list_guild(self, ctx: c.Context):
         paginator = c.Paginator()
@@ -49,7 +43,7 @@ class ListOfGuilds(c.Cog):
         return
 
 
-class DeleteGuild(c.Cog):
+class DeleteGuild(MainGuildOnly):
     @c.command(name="d_gld")
     async def delete_guild(self, ctx: c.Context, guild_id: int):  # 型変換できない場合と、潰す権限がない場合の例外処理がまだ
         if guild_id == kotori_guild_id or guild_id == dip_test_guild_id:
