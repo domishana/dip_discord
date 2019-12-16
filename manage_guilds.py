@@ -28,7 +28,7 @@ class CreateGuild(MainGuildOnly):
 
         self._bot.add_setting(created_guild)
 
-        invite_url = await self.create_invite_url(created_guild, "Welcome")
+        invite_url = await self.create_invite_url(created_guild, "welcome")
         await ctx.send(invite_url)
         return
 
@@ -63,10 +63,12 @@ class DeleteGuild(MainGuildOnly):
         guild: discord.Guild = ctx.bot.get_guild(guild_id)
         if guild is not None:
             await ctx.send(guild.name + "を削除します。")
+            """
             try:
                 self._bot.delete_setting(guild)
             except NotFoundGuildInListException:
                 await ctx.send("botに登録されているリストにこのサーバーは見つかりませんでした。")
+            """
             await guild.delete()
             await ctx.send("削除しました")
 
